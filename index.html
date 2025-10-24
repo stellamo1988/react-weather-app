@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+    }
+    .weather-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .search-input {
+      border-radius: 50px;
+      padding: 12px 24px;
+      border: 2px solid #e6dede;
+      font-size: 1.1rem;
+    }
+    .search-input:focus {
+      border-color: #66eab3;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .search-btn {
+      border-radius: 50px;
+      padding: 12px 32px;
+      font-weight: 600;
+      background: #3f3e3e;
+      border: none;
+    }
+    .search-btn:hover {
+      background: #d35574;
+    }
+    .weather-icon {
+      width: 100px;
+      height: 100px;
+    }
+    .temp-display {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #2d3748;
+    }
+    .weather-detail-card {
+      background: #f0f4ff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: none;
+    }
+    .detail-icon {
+      width: 24px;
+      height: 24px;
+      color: #667eea;
+    }
+    .detail-label {
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .detail-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2d3748;
+    }
+  </style>
+</head>
+<body>
+  <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="weather-card w-100">
+      <h1 class="text-center mb-4 fw-bold display-4">Weather App</h1>
+
+      <div class="mb-4">
+        <div class="row g-2">
+          <div class="col">
+            <input
+              type="text"
+              id="cityInput"
+              placeholder="Enter city name..."
+              class="form-control search-input"
+            />
+          </div>
+          <div class="col-auto">
+            <button id="searchBtn" class="btn btn-primary search-btn">
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="error" class="alert alert-danger d-none" role="alert"></div>
+
+      <div id="weatherDisplay" class="d-none">
+        <div class="text-center mb-4">
+          <h2 id="locationName" class="fw-bold mb-2"></h2>
+          <p id="localDate" class="text-muted"></p>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-center gap-4 py-4 mb-4">
+          <div id="weatherIcon"></div>
+          <div>
+            <div id="temperature" class="temp-display"></div>
+            <div id="condition" class="fs-4 text-muted"></div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-4 col-sm-6">
+            <div class="card weather-detail-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 detail-label">
+                  <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                  </svg>
+                  <span>Wind</span>
+                </div>
+                <div id="wind" class="detail-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+            <div class="card weather-detail-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 detail-label">
+                  <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"></path>
+                  </svg>
+                  <span>Humidity</span>
+                </div>
+                <div id="humidity" class="detail-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+            <div class="card weather-detail-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 detail-label">
+                  <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  <span>Visibility</span>
+                </div>
+                <div id="visibility" class="detail-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+            <div class="card weather-detail-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 detail-label">
+                  <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"></path>
+                  </svg>
+                  <span>Pressure</span>
+                </div>
+                <div id="pressure" class="detail-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+            <div class="card weather-detail-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 detail-label">
+                  <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5" stroke-width="2"></circle>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                  </svg>
+                  <span>Feels Like</span>
+                </div>
+                <div id="feelsLike" class="detail-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+            <div class="card weather-detail-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 detail-label">
+                  <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                  </svg>
+                  <span>UV Index</span>
+                </div>
+                <div id="uvIndex" class="detail-value"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = '7d77ecf93e1f4e1e8d9134829250110';
+    
+    // Get DOM elements
+    const cityInput = document.getElementById('cityInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const errorDiv = document.getElementById('error');
+    const weatherDisplay = document.getElementById('weatherDisplay');
+
+    // Weather icon SVGs
+    const icons = {
+      sun: `<svg class="weather-icon" fill="none" stroke="#fbbf24" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="5" stroke-width="2"></circle>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+      </svg>`,
+      cloud: `<svg class="weather-icon" fill="none" stroke="#9ca3af" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+      </svg>`,
+      rain: `<svg class="weather-icon" fill="none" stroke="#60a5fa" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 19v2m4-2v2m4-2v2"></path>
+      </svg>`
+    };
+
+    function getWeatherIcon(condition) {
+      const text = condition.toLowerCase();
+      if (text.includes('rain') || text.includes('drizzle')) {
+        return icons.rain;
+      } else if (text.includes('cloud')) {
+        return icons.cloud;
+      } else {
+        return icons.sun;
+      }
+    }
+
+    async function fetchWeather(cityName) {
+      if (!cityName.trim()) return;
+
+      // Show loading state
+      searchBtn.textContent = 'Loading...';
+      searchBtn.disabled = true;
+      errorDiv.classList.add('d-none');
+      weatherDisplay.classList.add('d-none');
+
+      try {
+        const response = await fetch(
+          `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${cityName}&aqi=no`
+        );
+
+        if (!response.ok) {
+          throw new Error('City not found');
+        }
+
+        const data = await response.json();
+        displayWeather(data);
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('d-none');
+      } finally {
+        searchBtn.textContent = 'Search';
+        searchBtn.disabled = false;
+      }
+    }
+
+    function displayWeather(data) {
+      // Location and date
+      document.getElementById('locationName').textContent = 
+        `${data.location.name}, ${data.location.country}`;
+      
+      const date = new Date(data.location.localtime);
+      document.getElementById('localDate').textContent = date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Weather icon and main info
+      document.getElementById('weatherIcon').innerHTML = 
+        getWeatherIcon(data.current.condition.text);
+      document.getElementById('temperature').textContent = 
+        `${Math.round(data.current.temp_c)}°C`;
+      document.getElementById('condition').textContent = 
+        data.current.condition.text;
+
+      // Details
+      document.getElementById('wind').textContent = 
+        `${data.current.wind_kph} km/h`;
+      document.getElementById('humidity').textContent = 
+        `${data.current.humidity}%`;
+      document.getElementById('visibility').textContent = 
+        `${data.current.vis_km} km`;
+      document.getElementById('pressure').textContent = 
+        `${data.current.pressure_mb} mb`;
+      document.getElementById('feelsLike').textContent = 
+        `${Math.round(data.current.feelslike_c)}°C`;
+      document.getElementById('uvIndex').textContent = 
+        data.current.uv;
+
+      // Show weather display
+      weatherDisplay.classList.remove('d-none');
+    }
+
+    // Event listeners
+    searchBtn.addEventListener('click', () => {
+      fetchWeather(cityInput.value);
+    });
+
+    cityInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        fetchWeather(cityInput.value);
+      }
+    });
+
+    // Load default city on page load
+    window.addEventListener('load', () => {
+      fetchWeather('Johannesburg');
+    });
+  </script>
+</body>
+</html>
